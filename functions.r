@@ -17,4 +17,6 @@ library(magrittr)
 library(readr)
 library(tidyverse)
 
-
+getValidationIndex <-function(dataset, percent){
+  return (createDataPartition(dataset$Species, p=percent, list=FALSE))
+}

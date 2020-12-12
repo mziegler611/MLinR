@@ -6,8 +6,8 @@
 #install.packages("caret")
 #install.packages("caret", dependencies=c("Depends", "Suggests"))
 
-source("/Users/leianna/Documents/321F20/MLinR/functions.R", chdir = TRUE)
-#source("/Users/morganziegler/Desktop/MLinR-main/functions.R")
+#source("/Users/leianna/Documents/321F20/MLinR/functions.R", chdir = TRUE)
+source("/Users/morganziegler/Desktop/MLinR-main/functions.R")
 	
 library(caret)
 library(readxl)
@@ -26,7 +26,7 @@ data(iris)
 dataset <- iris
 
 #get 80% of the data to train the model on
-validation_index <- createDataPartition(dataset$Species, p=0.80, list=FALSE)
+validation_index <- getValidationIndex(dataset, .80)
 
 validation <- dataset[-validation_index,]
 
@@ -61,7 +61,49 @@ for(i in 1:4) {
 plot(y)
 
 
-#not runnin yet
+#feature plots for the features according to species
 print(featurePlot(x, y, "ellipse"))
 print(featurePlot(x, y, "box"))
-print("done")
+
+#differnce in distribution of each feature by species
+scales <- list(x=list(relation="free"), y=list(relation="free"))
+featurePlot(x=x, y=y, plot="density", scales=scales)
+
+
+
+
+# Run algorithms using 10-fold cross validation
+control <- trainControl(method="cv", number=10)
+metric <- "Accuracy"
+
+# a) linear algorithms
+set.seed(7)
+fit.lda <- train(Species~., data=dataset, method="lda", metric=metric, trControl=control)
+# b) nonlinear algorithms
+# CART
+set.seed(7)
+fit.cart <- train(Species~., data=dataset, method="rpart", metric=metric, trControl=control)
+# kNN
+set.seed(7)
+fit.knn <- train(Species~., data=dataset, method="knn", metric=metric, trControl=control)
+# c) advanced algorithms
+# SVM
+set.seed(7)
+fit.svm <- train(Species~., data=dataset, method="svmRadial", metric=metric, trControl=control)
+# Random Forest
+set.seed(7)
+fit.rf <- train(Species~., data=dataset, method="rf", metric=metric, trControl=control)
+
+# summarize accuracy of models
+results <- resamples(list(lda=fit.lda, cart=fit.cart, knn=fit.knn, svm=fit.svm, rf=fit.rf))
+print(summary(results))
+
+# compare accuracy of models
+print(dotplot(results))
+
+print(fit.lda)
+
+# estimate skill of LDA on the validation dataset
+predictions <- predict(fit.lda, validation)
+print("Confusion Matrix")
+print(confusionMatrix(predictions, validation$Species))
