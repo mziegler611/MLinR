@@ -5,6 +5,7 @@
 #--------------------------------------
 
 source("/Users/morganziegler/Desktop/MLinR-main/functions.R")
+#source("/Users/leianna/Documents/321F20/MLinR/functions.R", chdir = TRUE)
 
 #devtools::install_github("collectivemedia/tictoc")
 
@@ -19,8 +20,11 @@ library(magrittr)
 library(readr)
 library(tidyverse)
 library(tictoc)
+library(testthat)
 
-timing <-function(percent){
+
+
+timing <-function(dataset, percent){
     
     tic("Training:")
     validation_index <- getValidationIndex(dataset, percent)
@@ -38,18 +42,27 @@ timing <-function(percent){
     toc()
     print(" ", quote = FALSE)
     #print(fit.lda)
-   
+
     
 }
-data(iris)
-dataset <- iris
 
-print(".8 Percent ", quote = FALSE)
-timing(.8)
-print(".9 Percent ", quote = FALSE)
-timing(.9)
-print(".5 Percent ", quote = FALSE)
-timing(.5)
-print("1 Percent ", quote = FALSE)
-timing(1)
+timingTest <-function(){
+    data(iris)
+    dataset <- iris
+    print(".3 Percent ", quote = FALSE)
+    timing(dataset, .3)
+    print(".4 Percent ", quote = FALSE)
+    timing(dataset, .4)
+    print(".5 Percent ", quote = FALSE)
+    timing(dataset, .5)
+    print(".8 Percent ", quote = FALSE)
+    timing(dataset, .8)
+    print(".9 Percent ", quote = FALSE)
+    timing(dataset, .9)
+
+}
+
+
+timingTest()
+
 

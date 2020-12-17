@@ -21,13 +21,14 @@ library(readr)
 library(tidyverse)
 
 
-
+#load the dataset
 data(iris)
 dataset <- iris
 
 #get 80% of the data to train the model on
 validation_index <- getValidationIndex(dataset, .80)
 
+#this keeps the other 20% of the data to use to validate our model
 validation <- dataset[-validation_index,]
 
 dataset <- dataset[validation_index,]
@@ -39,10 +40,12 @@ sapply(dataset, class)
 #print the first 5 rows of the data to see what it looks like
 print(head(dataset))
 
+#print the frequency of each species of iris
 levels(dataset$Species)
 percentage <- prop.table(table(dataset$Species)) * 100
 print(cbind(freq=table(dataset$Species), percentage=percentage))
 
+#print the descriptors of the features of the dataset
 print(summary(dataset))
 
 x <- dataset[,1:4]
@@ -98,12 +101,12 @@ fit.rf <- train(Species~., data=dataset, method="rf", metric=metric, trControl=c
 results <- resamples(list(lda=fit.lda, cart=fit.cart, knn=fit.knn, svm=fit.svm, rf=fit.rf))
 print(summary(results))
 
-# compare accuracy of models
+# compare accuracy of models 
 print(dotplot(results))
 
 print(fit.lda)
 
-# estimate skill of LDA on the validation dataset
+# estimate accuracy of LDA on the validation dataset
 predictions <- predict(fit.lda, validation)
 print("Confusion Matrix")
 print(confusionMatrix(predictions, validation$Species))
